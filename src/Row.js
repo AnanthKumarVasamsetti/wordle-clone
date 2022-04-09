@@ -19,13 +19,12 @@ const __css = {
 
 function getColValues() {
   var values = {};
-
   for (var i = 0; i < WORD_LENGTH; i++) {
     values[i] = "";
   }
-
   return values;
 }
+
 function Row() {
   var [colValues, setCol] = useState(() => getColValues());
 
