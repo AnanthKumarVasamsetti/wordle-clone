@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
 var WORD_LENGTH = 5;
+var CURR_INDEX = 0;
 
 const __css = {
   gridItem: {
@@ -28,15 +29,51 @@ function getColValues() {
 function Row() {
   var [colValues, setCol] = useState(() => getColValues());
 
-  return Array.from(Array(WORD_LENGTH).keys()).map((value) => (
+  //For listening keyboard events
+  useEffect(() => {
+    document.addEventListener("keydown", (event) => {
+      var pressedKeyCode = event.keyCode;
+
+      if (pressedKeyCode >= 65 && pressedKeyCode <= 90) {
+        setCol((prevState) => {
+          var currState = { ...prevState };
+          currState[CURR_INDEX] = event.key.toUpperCase();
+          return currState;
+        });
+        CURR_INDEX++;
+      }
+    });
+  }, []);
+
+  return (
     <>
-      <Grid key={'index_'+ value} item>
+      <Grid key={0} item>
         <Paper sx={__css.gridItem} variant="outlined" square>
-          <div>{colValues[value]}</div>
+          <div>{colValues[0]}</div>
+        </Paper>
+      </Grid>
+      <Grid key={1} item>
+        <Paper sx={__css.gridItem} variant="outlined" square>
+          <div>{colValues[1]}</div>
+        </Paper>
+      </Grid>
+      <Grid key={2} item>
+        <Paper sx={__css.gridItem} variant="outlined" square>
+          <div>{colValues[2]}</div>
+        </Paper>
+      </Grid>
+      <Grid key={3} item>
+        <Paper sx={__css.gridItem} variant="outlined" square>
+          <div>{colValues[3]}</div>
+        </Paper>
+      </Grid>
+      <Grid key={4} item>
+        <Paper sx={__css.gridItem} variant="outlined" square>
+          <div>{colValues[4]}</div>
         </Paper>
       </Grid>
     </>
-  ));
+  );
 }
 
 export default Row;
