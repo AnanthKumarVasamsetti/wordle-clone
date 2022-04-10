@@ -3,7 +3,10 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
 var WORD_LENGTH = 5;
+var RETRIES_LIMIT = 6;
+
 var CURR_INDEX = 0;
+var RETRY_INDEX = 0;
 
 const __css = {
   gridItem: {
@@ -20,8 +23,11 @@ const __css = {
 
 function getColValues() {
   var values = {};
-  for (var i = 0; i < WORD_LENGTH; i++) {
-    values[i] = "";
+  for (var i = 0; i < RETRIES_LIMIT; i++) {
+    values[i] = {};
+    for (var j = 0; j < WORD_LENGTH; j++) {
+      values[i][j] = "";
+    }
   }
   return values;
 }
@@ -34,44 +40,37 @@ function Row() {
     document.addEventListener("keydown", (event) => {
       var pressedKeyCode = event.keyCode;
 
-      if (pressedKeyCode >= 65 && pressedKeyCode <= 90) {
-        setCol((prevState) => {
-          var currState = { ...prevState };
-          currState[CURR_INDEX] = event.key.toUpperCase();
-          return currState;
-        });
-        CURR_INDEX++;
+      if (pressedKeyCode === 13 && CURR_INDEX === WORD_LENGTH) {
+        RETRY_INDEX++;
+        CURR_INDEX = 0;
+      } else {
+        if (pressedKeyCode >= 65 && pressedKeyCode <= 90 && CURR_INDEX < WORD_LENGTH) {
+          if (RETRY_INDEX < RETRIES_LIMIT) {
+            setCol((prevState) => {
+              var currState = { ...prevState };
+              currState[RETRY_INDEX][CURR_INDEX] = event.key.toUpperCase();
+              return currState;
+            });
+          }
+          CURR_INDEX++;
+        }
       }
     });
   }, []);
 
   return (
     <>
-      <Grid key={0} item>
-        <Paper sx={__css.gridItem} variant="outlined" square>
-          <div>{colValues[0]}</div>
-        </Paper>
-      </Grid>
-      <Grid key={1} item>
-        <Paper sx={__css.gridItem} variant="outlined" square>
-          <div>{colValues[1]}</div>
-        </Paper>
-      </Grid>
-      <Grid key={2} item>
-        <Paper sx={__css.gridItem} variant="outlined" square>
-          <div>{colValues[2]}</div>
-        </Paper>
-      </Grid>
-      <Grid key={3} item>
-        <Paper sx={__css.gridItem} variant="outlined" square>
-          <div>{colValues[3]}</div>
-        </Paper>
-      </Grid>
-      <Grid key={4} item>
-        <Paper sx={__css.gridItem} variant="outlined" square>
-          <div>{colValues[4]}</div>
-        </Paper>
-      </Grid>
+      {Array.from(Array(RETRIES_LIMIT).keys()).map((row) => {
+        return Array.from(Array(WORD_LENGTH).keys()).map((col) => {
+          return (
+            <Grid key={row + "," + col} item>
+              <Paper sx={__css.gridItem} variant="outlined" square>
+                <div>{colValues[row][col]}</div>
+              </Paper>
+            </Grid>
+          );
+        });
+      })}
     </>
   );
 }
